@@ -16,8 +16,8 @@ class AppSettings:
     """Runtime configuration loaded from environment variables."""
 
     app_name: str = "NBA Finals Predictor"
-    season: str = "2023-24"
-    season_type: str = "Regular Season"
+    season: str = "2025-26"
+    season_type: str = "Playoffs"
     timeout_seconds: int = int(os.getenv("NBA_API_TIMEOUT_SECONDS", "30"))
     cache_dir: Path = Path(os.getenv("NBA_CACHE_DIR", "data/raw"))
     processed_dir: Path = Path("data/processed")

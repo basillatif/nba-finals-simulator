@@ -2,9 +2,23 @@
 
 from __future__ import annotations
 
+import sys
+from pathlib import Path
+
 import pandas as pd
 import plotly.express as px
 import streamlit as st
+
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+APP_DIR = Path(__file__).resolve().parents[1]
+
+if str(APP_DIR) in sys.path:
+    sys.path.remove(str(APP_DIR))
+sys.path = [path for path in sys.path if path != str(PROJECT_ROOT)]
+sys.path.insert(0, str(PROJECT_ROOT))
+
+if "app" in sys.modules and not hasattr(sys.modules["app"], "__path__"):
+    del sys.modules["app"]
 
 from app.data_service import load_team_stats
 from config.settings import settings

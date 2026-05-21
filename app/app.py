@@ -58,10 +58,11 @@ apply_theme()
 
 st.sidebar.title(settings.app_name)
 season = st.sidebar.text_input("Season", value=settings.season)
+season_type_options = ["Regular Season", "Playoffs"]
 season_type = st.sidebar.selectbox(
     "Season type",
-    ["Regular Season", "Playoffs"],
-    index=0,
+    season_type_options,
+    index=season_type_options.index(settings.season_type),
 )
 force_refresh = st.sidebar.toggle("Refresh nba_api cache", value=False)
 
