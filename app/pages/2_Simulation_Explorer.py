@@ -1,0 +1,59 @@
+"""Monte Carlo simulation explorer page."""
+
+from __future__ import annotations
+
+import streamlit as st
+
+from app.data_service import load_team_stats
+from config.settings import settings
+from models.baseline import heuristic_game_probability
+from simulation.monte_carlo import simulate_finals_series
+from utils.charts import outcome_histogram, probability_bar
+
+
+st.set_page_config(page_title="Simulation Explorer", layout="wide")
+st.title("Simulation Explorer")
+
+teams = load_team_stats(settings.season, settings.season_type)
+team_names = teams["team_name"].sort_values().tolist()
+
+controls_top = st.columns(2)
+team_a_name = controls_top[0].selectbox("Home-court Team A", team_names, index=0)
+team_b_name = controls_top[1].selectbox("Team B", team_names, index=min(1, len(team_names) - 1))
+
+team_a = teams.loc[teams["team_name"] == team_a_name].iloc[0]
+team_b = teams.loc[teams["team_name"] == team_b_name].iloc[0]
+
+controls = st.columns(4)
+simulations = controls[0].slider("Simulations", 10_000, 100_000, settings.default_simulations, 5_000)
+home_edge = controls[1].slider("Home-court edge", 0.0, 0.08, settings.home_court_edge, 0.005)
+injury_a = controls[2].slider(f"{team_a_name} injury adjustment", -10.0, 10.0, 0.0, 0.5)
+injury_b = controls[3].slider(f"{team_b_name} injury adjustment", -10.0, 10.0, 0.0, 0.5)
+
+with st.spinner("Running Monte Carlo simulation..."):
+    neutral_probability_a = heuristic_game_probability(
+        team_a,
+        team_b,
+        injury_adjustment_a=injury_a,
+        injury_adjustment_b=injury_b,
+    )
+    result = simulate_finals_series(
+        team_a_name=team_a_name,
+        team_b_name=team_b_name,
+        neutral_win_probability_a=neutral_probability_a,
+        simulations=simulations,
+        home_court_edge=home_edge,
+    )
+
+summary_cols = st.columns(3)
+summary_cols[0].metric(f"{team_a_name} title probability", f"{result.team_a_championship_probability:.1%}")
+summary_cols[1].metric(f"{team_b_name} title probability", f"{result.team_b_championship_probability:.1%}")
+summary_cols[2].metric("Expected length", f"{result.expected_series_length:.2f} games")
+
+st.plotly_chart(
+    probability_bar(team_a_name, team_b_name, result.team_a_championship_probability),
+    use_container_width=True,
+)
+st.plotly_chart(outcome_histogram(result.outcomes), use_container_width=True)
+
+st.dataframe(result.outcomes.sort_values("probability", ascending=False), use_container_width=True, hide_index=True)
