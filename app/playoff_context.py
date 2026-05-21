@@ -5,6 +5,7 @@ from __future__ import annotations
 
 EAST_FINAL_MATCHUP = ("Cleveland Cavaliers", "New York Knicks")
 WEST_FINAL_MATCHUP = ("Oklahoma City Thunder", "San Antonio Spurs")
+ACTIVE_PLAYOFF_TEAMS = (*EAST_FINAL_MATCHUP, *WEST_FINAL_MATCHUP)
 
 
 def team_index(team_names: list[str], preferred_team: str, fallback: int = 0) -> int:
