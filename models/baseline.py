@@ -5,18 +5,19 @@ from __future__ import annotations
 import math
 
 import pandas as pd
-from sklearn.linear_model import LogisticRegression
-from sklearn.pipeline import Pipeline
 
 from data.preprocessing import FEATURE_COLUMNS, build_preprocessor, create_matchup_features
 
 
-def build_logistic_regression_model() -> Pipeline:
+def build_logistic_regression_model():
     """Return the baseline model pipeline.
 
     The estimator is intentionally simple for the first production slice. The module boundary
     lets us replace it with XGBoost or LightGBM without rewriting Streamlit or simulation code.
     """
+
+    from sklearn.linear_model import LogisticRegression
+    from sklearn.pipeline import Pipeline
 
     return Pipeline(
         steps=[

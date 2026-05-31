@@ -19,7 +19,7 @@ if "app" in sys.modules and not hasattr(sys.modules["app"], "__path__"):
     del sys.modules["app"]
 
 from app.data_service import load_team_stats
-from app.playoff_context import EAST_FINAL_MATCHUP, team_index
+from app.playoff_context import FINALS_MATCHUP, team_index
 from config.settings import settings
 from models.baseline import heuristic_game_probability
 from models.explainability import build_matchup_narrative
@@ -33,8 +33,8 @@ teams = load_team_stats(settings.season, settings.season_type)
 team_names = teams["team_name"].sort_values().tolist()
 
 left, right = st.columns(2)
-team_a_name = left.selectbox("Team A", team_names, index=team_index(team_names, EAST_FINAL_MATCHUP[0]))
-team_b_name = right.selectbox("Team B", team_names, index=team_index(team_names, EAST_FINAL_MATCHUP[1], 1))
+team_a_name = left.selectbox("Team A", team_names, index=team_index(team_names, FINALS_MATCHUP[0]))
+team_b_name = right.selectbox("Team B", team_names, index=team_index(team_names, FINALS_MATCHUP[1], 1))
 
 team_a = teams.loc[teams["team_name"] == team_a_name].iloc[0]
 team_b = teams.loc[teams["team_name"] == team_b_name].iloc[0]

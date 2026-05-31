@@ -1,6 +1,6 @@
 # NBA Finals Predictor
 
-An interactive Streamlit analytics app for predicting an NBA Finals matchup using team statistics, interpretable modeling, and Monte Carlo simulation.
+An interactive Streamlit analytics app for predicting the 2026 NBA Finals matchup between the San Antonio Spurs and New York Knicks.
 
 ## Architecture
 
@@ -30,6 +30,7 @@ streamlit run app/app.py
 - Preprocessing hooks for missing values, scaling, recent form, and playoff weighting.
 - Interpretable game-win probability baseline.
 - Best-of-7 Finals Monte Carlo simulator with home-court advantage.
+- Fixed Spurs-Knicks Finals simulator.
 - Streamlit pages for home, team comparison, simulation exploration, and model insights.
 - Plotly probability bars, outcome charts, and matchup radar charts.
 

@@ -7,20 +7,6 @@ import pandas as pd
 
 SAMPLE_TEAM_STATS = [
     {
-        "team_id": 1610612739,
-        "team_name": "Cleveland Cavaliers",
-        "off_rating": 119.4,
-        "def_rating": 111.5,
-        "net_rating": 7.9,
-        "pace": 98.5,
-        "ts_pct": 0.603,
-        "reb_pct": 50.7,
-        "tm_tov_pct": 12.4,
-        "clutch_net_rating": 7.6,
-        "recent_net_rating": 6.8,
-        "playoff_weight": 1.05,
-    },
-    {
         "team_id": 1610612752,
         "team_name": "New York Knicks",
         "off_rating": 117.8,
@@ -33,20 +19,6 @@ SAMPLE_TEAM_STATS = [
         "clutch_net_rating": 9.8,
         "recent_net_rating": 7.4,
         "playoff_weight": 1.06,
-    },
-    {
-        "team_id": 1610612760,
-        "team_name": "Oklahoma City Thunder",
-        "off_rating": 120.6,
-        "def_rating": 110.1,
-        "net_rating": 10.5,
-        "pace": 100.1,
-        "ts_pct": 0.612,
-        "reb_pct": 49.8,
-        "tm_tov_pct": 11.1,
-        "clutch_net_rating": 10.9,
-        "recent_net_rating": 9.7,
-        "playoff_weight": 1.07,
     },
     {
         "team_id": 1610612759,

@@ -5,6 +5,7 @@ from __future__ import annotations
 import streamlit as st
 
 from app.data_service import load_team_stats
+from app.playoff_context import EAST_CHAMPION, WEST_CHAMPION
 from config.settings import settings
 
 
@@ -71,7 +72,7 @@ with st.spinner("Loading team metrics..."):
 
 st.markdown('<div class="hero-title">NBA Finals Predictor</div>', unsafe_allow_html=True)
 st.markdown(
-    '<div class="hero-copy">An interactive analytics workbench for comparing Finals matchups, estimating game-level win probability, and stress-testing outcomes with Monte Carlo simulation.</div>',
+    f'<div class="hero-copy">An interactive analytics workbench for the 2026 NBA Finals between the {WEST_CHAMPION} and {EAST_CHAMPION}.</div>',
     unsafe_allow_html=True,
 )
 

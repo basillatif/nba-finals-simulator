@@ -5,7 +5,6 @@ from __future__ import annotations
 from pathlib import Path
 
 import pandas as pd
-from nba_api.stats.endpoints import leaguedashteamclutch, leaguedashteamstats
 
 from config.settings import settings
 from data.sample_teams import load_sample_team_stats
@@ -47,6 +46,8 @@ def fetch_team_stats(
         return pd.read_csv(cache_file)
 
     try:
+        from nba_api.stats.endpoints import leaguedashteamstats
+
         logger.info("Fetching team stats for %s (%s)", season, season_type)
         base = leaguedashteamstats.LeagueDashTeamStats(
             season=season,
@@ -70,6 +71,8 @@ def fetch_clutch_metrics(
     season_type: str = settings.season_type,
 ) -> pd.DataFrame:
     """Fetch clutch net rating when available."""
+
+    from nba_api.stats.endpoints import leaguedashteamclutch
 
     clutch = leaguedashteamclutch.LeagueDashTeamClutch(
         season=season,

@@ -6,9 +6,6 @@ from typing import Iterable
 
 import numpy as np
 import pandas as pd
-from sklearn.impute import SimpleImputer
-from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import StandardScaler
 
 
 FEATURE_COLUMNS = [
@@ -37,8 +34,12 @@ def enrich_team_features(team_stats: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def build_preprocessor() -> Pipeline:
+def build_preprocessor():
     """Create a numeric preprocessing pipeline for baseline models."""
+
+    from sklearn.impute import SimpleImputer
+    from sklearn.pipeline import Pipeline
+    from sklearn.preprocessing import StandardScaler
 
     return Pipeline(
         steps=[
