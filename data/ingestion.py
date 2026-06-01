@@ -36,7 +36,7 @@ def fetch_team_stats(
     season_type: str = settings.season_type,
     force_refresh: bool = False,
 ) -> pd.DataFrame:
-    """Fetch team-level stats from nba_api with CSV caching and sample fallback."""
+    """Load team-level stats from cache, with explicit live refresh support."""
 
     settings.cache_dir.mkdir(parents=True, exist_ok=True)
     cache_file = _cache_path(season, season_type)
@@ -44,6 +44,10 @@ def fetch_team_stats(
     if cache_file.exists() and not force_refresh:
         logger.info("Loading cached team stats from %s", cache_file)
         return pd.read_csv(cache_file)
+
+    if not force_refresh:
+        logger.info("No cached team stats found at %s; using sample data", cache_file)
+        return load_sample_team_stats()
 
     try:
         from nba_api.stats.endpoints import leaguedashteamstats
