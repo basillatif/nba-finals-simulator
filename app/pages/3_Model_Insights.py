@@ -46,7 +46,7 @@ fig = px.bar(
     x="weight",
     y="feature",
     orientation="h",
-    template="plotly_dark",
+    template="plotly_white",
     title="Baseline Feature Direction",
 )
 st.plotly_chart(fig, use_container_width=True)

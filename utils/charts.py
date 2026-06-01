@@ -26,7 +26,7 @@ def probability_bar(team_a: str, team_b: str, prob_a: float) -> go.Figure:
         yaxis_range=[0, 1],
         height=360,
         margin=dict(l=20, r=20, t=30, b=20),
-        template="plotly_dark",
+        template="plotly_white",
     )
     return fig
 
@@ -42,7 +42,7 @@ def outcome_histogram(outcomes: pd.DataFrame) -> go.Figure:
         y="probability",
         color="winner",
         text=frame["probability"].map(lambda value: f"{value:.1%}"),
-        template="plotly_dark",
+        template="plotly_white",
     )
     fig.update_layout(
         xaxis_title="Series outcome",
@@ -79,7 +79,7 @@ def radar_chart(team_a: pd.Series, team_b: pd.Series) -> go.Figure:
     fig.add_trace(go.Scatterpolar(r=values_b, theta=labels, fill="toself", name=team_b["team_name"]))
     fig.update_layout(
         polar=dict(radialaxis=dict(visible=True, range=[0, 100])),
-        template="plotly_dark",
+        template="plotly_white",
         height=440,
         margin=dict(l=40, r=40, t=40, b=40),
     )

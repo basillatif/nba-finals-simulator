@@ -18,22 +18,22 @@ st.set_page_config(
 
 
 def apply_theme() -> None:
-    """Apply NBA-inspired dark styling."""
+    """Apply clean light styling."""
 
     st.markdown(
         """
         <style>
         .stApp {
-            background: radial-gradient(circle at top left, #18243a 0, #080b12 36%, #05070d 100%);
-            color: #f7f7fb;
+            background: #f8fafc;
+            color: #172033;
         }
         section[data-testid="stSidebar"] {
-            background: #090d16;
-            border-right: 1px solid rgba(255, 255, 255, 0.08);
+            background: #ffffff;
+            border-right: 1px solid #e2e8f0;
         }
         div[data-testid="metric-container"] {
-            background: rgba(255, 255, 255, 0.055);
-            border: 1px solid rgba(255, 255, 255, 0.10);
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
             border-radius: 8px;
             padding: 14px;
         }
@@ -45,7 +45,7 @@ def apply_theme() -> None:
             margin-bottom: 0.25rem;
         }
         .hero-copy {
-            color: #c9d3e5;
+            color: #475569;
             max-width: 850px;
             font-size: 1.05rem;
         }
