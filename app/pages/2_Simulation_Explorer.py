@@ -50,19 +50,12 @@ controls_top[1].text_input("Team B", value=team_b_name, disabled=True)
 team_a = teams.loc[teams["team_name"] == team_a_name].iloc[0]
 team_b = teams.loc[teams["team_name"] == team_b_name].iloc[0]
 
-controls = st.columns(4)
+controls = st.columns(2)
 simulations = controls[0].slider("Simulations", 10_000, 100_000, settings.default_simulations, 5_000)
 home_edge = controls[1].slider("Home-court edge", 0.0, 0.08, settings.home_court_edge, 0.005)
-injury_a = controls[2].slider(f"{team_a_name} injury adjustment", -10.0, 10.0, 0.0, 0.5)
-injury_b = controls[3].slider(f"{team_b_name} injury adjustment", -10.0, 10.0, 0.0, 0.5)
 
 with st.spinner("Running Monte Carlo simulation..."):
-    neutral_probability_a = heuristic_game_probability(
-        team_a,
-        team_b,
-        injury_adjustment_a=injury_a,
-        injury_adjustment_b=injury_b,
-    )
+    neutral_probability_a = heuristic_game_probability(team_a, team_b)
     result = simulate_finals_series(
         team_a_name=team_a_name,
         team_b_name=team_b_name,
