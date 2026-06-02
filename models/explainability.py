@@ -17,6 +17,12 @@ EXPLANATION_FEATURES = [
 ]
 
 
+def possessive(name: str) -> str:
+    """Return a readable possessive team name."""
+
+    return f"{name}'" if name.endswith("s") else f"{name}'s"
+
+
 def build_matchup_narrative(team_a: pd.Series, team_b: pd.Series, favorite: str) -> str:
     """Generate an interpretable explanation from the largest stat edges."""
 
@@ -36,7 +42,7 @@ def build_matchup_narrative(team_a: pd.Series, team_b: pd.Series, favorite: str)
 
     top_edges = [label for diff, label in sorted(edges, reverse=True) if diff > 0][:3]
     if not top_edges:
-        return f"{favorite}'s projection is narrow, with no single statistical category dominating the matchup."
+        return f"{possessive(favorite)} projection is narrow, with no single statistical category dominating the matchup."
 
     readable_edges = ", ".join(top_edges[:-1])
     if len(top_edges) > 1:
@@ -44,4 +50,4 @@ def build_matchup_narrative(team_a: pd.Series, team_b: pd.Series, favorite: str)
     else:
         readable_edges = top_edges[0]
 
-    return f"{favorite}'s edge comes from {readable_edges}."
+    return f"{possessive(favorite)} edge comes from {readable_edges}."

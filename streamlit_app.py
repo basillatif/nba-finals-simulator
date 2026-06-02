@@ -1,3 +1,8 @@
 """Streamlit Community Cloud entrypoint."""
 
-from app.Home import *  # noqa: F401,F403
+from __future__ import annotations
+
+import runpy
+
+
+runpy.run_module("app.Home", run_name="__main__")
