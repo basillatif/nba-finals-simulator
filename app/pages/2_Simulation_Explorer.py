@@ -18,7 +18,7 @@ sys.path.insert(0, str(PROJECT_ROOT))
 if "app" in sys.modules and not hasattr(sys.modules["app"], "__path__"):
     del sys.modules["app"]
 
-from app.data_service import load_team_stats
+from app.data_service import load_team_stats_dataset
 from app.playoff_context import FINALS_MATCHUP, team_index
 from config.settings import settings
 from models.baseline import heuristic_game_probability
@@ -29,7 +29,12 @@ from utils.charts import outcome_histogram, probability_bar
 st.set_page_config(page_title="Simulation Explorer", layout="wide")
 st.title("Simulation Explorer")
 
-teams = load_team_stats(settings.season, settings.season_type)
+dataset = load_team_stats_dataset(settings.season, settings.season_type)
+teams = dataset.teams
+st.caption(f"Data source: {dataset.source.replace('_', ' ').title()}")
+if not dataset.is_real_data:
+    st.error("Real NBA data is unavailable, so simulations are disabled.")
+    st.stop()
 team_names = teams["team_name"].sort_values().tolist()
 
 controls_top = st.columns(2)

@@ -7,6 +7,8 @@ __pycache__/
 venv/
 .env
 data/raw/*.csv
+!data/raw/team_stats_2025-26_playoffs.csv
+!data/raw/team_stats_2025-26_regular_season.csv
 data/processed/*.csv
 models/artifacts/
 .DS_Store

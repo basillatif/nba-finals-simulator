@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from dataclasses import dataclass
+from datetime import datetime, timezone
 from pathlib import Path
 
 import pandas as pd
@@ -26,9 +28,93 @@ CORE_COLUMNS = {
 }
 
 
+@dataclass(frozen=True)
+class TeamStatsFetchResult:
+    """Team stats plus provenance for launch-safe predictions."""
+
+    stats: pd.DataFrame
+    source: str
+    cache_path: Path | None = None
+    last_updated: datetime | None = None
+    error: str | None = None
+
+    @property
+    def is_real_data(self) -> bool:
+        """Return whether the result came from NBA API live or cached data."""
+
+        return self.source in {"live_nba_api", "cached_nba_api"}
+
+
 def _cache_path(season: str, season_type: str) -> Path:
     safe_type = season_type.lower().replace(" ", "_")
     return settings.cache_dir / f"team_stats_{season}_{safe_type}.csv"
+
+
+def _cache_timestamp(cache_file: Path) -> datetime:
+    return datetime.fromtimestamp(cache_file.stat().st_mtime, tz=timezone.utc)
+
+
+def _fetch_live_team_stats(season: str, season_type: str) -> pd.DataFrame:
+    from nba_api.stats.endpoints import leaguedashteamstats
+
+    logger.info("Fetching team stats for %s (%s)", season, season_type)
+    base = leaguedashteamstats.LeagueDashTeamStats(
+        season=season,
+        season_type_all_star=season_type,
+        measure_type_detailed_defense="Advanced",
+        timeout=settings.timeout_seconds,
+    ).get_data_frames()[0]
+
+    stats = base.rename(columns=CORE_COLUMNS)[list(CORE_COLUMNS.values())]
+    clutch = fetch_clutch_metrics(season=season, season_type=season_type)
+    return stats.merge(clutch, on=["team_id", "team_name"], how="left")
+
+
+def fetch_team_stats_with_metadata(
+    season: str = settings.season,
+    season_type: str = settings.season_type,
+    force_refresh: bool = False,
+) -> TeamStatsFetchResult:
+    """Load team-level stats with explicit data-source metadata."""
+
+    settings.cache_dir.mkdir(parents=True, exist_ok=True)
+    cache_file = _cache_path(season, season_type)
+
+    if cache_file.exists() and not force_refresh:
+        logger.info("Loading cached team stats from %s", cache_file)
+        return TeamStatsFetchResult(
+            stats=pd.read_csv(cache_file),
+            source="cached_nba_api",
+            cache_path=cache_file,
+            last_updated=_cache_timestamp(cache_file),
+        )
+
+    try:
+        stats = _fetch_live_team_stats(season, season_type)
+        stats.to_csv(cache_file, index=False)
+        return TeamStatsFetchResult(
+            stats=stats,
+            source="live_nba_api",
+            cache_path=cache_file,
+            last_updated=_cache_timestamp(cache_file),
+        )
+    except Exception as exc:  # pragma: no cover - protects Streamlit UX from API outages
+        if cache_file.exists():
+            logger.warning("nba_api refresh failed; using cached data. Error: %s", exc)
+            return TeamStatsFetchResult(
+                stats=pd.read_csv(cache_file),
+                source="cached_nba_api",
+                cache_path=cache_file,
+                last_updated=_cache_timestamp(cache_file),
+                error=str(exc),
+            )
+
+        logger.warning("nba_api ingestion failed and no cache exists; using sample data. Error: %s", exc)
+        return TeamStatsFetchResult(
+            stats=load_sample_team_stats(),
+            source="sample_fallback",
+            error=str(exc),
+        )
 
 
 def fetch_team_stats(
@@ -38,36 +124,7 @@ def fetch_team_stats(
 ) -> pd.DataFrame:
     """Load team-level stats from cache, with explicit live refresh support."""
 
-    settings.cache_dir.mkdir(parents=True, exist_ok=True)
-    cache_file = _cache_path(season, season_type)
-
-    if cache_file.exists() and not force_refresh:
-        logger.info("Loading cached team stats from %s", cache_file)
-        return pd.read_csv(cache_file)
-
-    if not force_refresh:
-        logger.info("No cached team stats found at %s; using sample data", cache_file)
-        return load_sample_team_stats()
-
-    try:
-        from nba_api.stats.endpoints import leaguedashteamstats
-
-        logger.info("Fetching team stats for %s (%s)", season, season_type)
-        base = leaguedashteamstats.LeagueDashTeamStats(
-            season=season,
-            season_type_all_star=season_type,
-            measure_type_detailed_defense="Advanced",
-            timeout=settings.timeout_seconds,
-        ).get_data_frames()[0]
-
-        stats = base.rename(columns=CORE_COLUMNS)[list(CORE_COLUMNS.values())]
-        clutch = fetch_clutch_metrics(season=season, season_type=season_type)
-        stats = stats.merge(clutch, on=["team_id", "team_name"], how="left")
-        stats.to_csv(cache_file, index=False)
-        return stats
-    except Exception as exc:  # pragma: no cover - protects Streamlit UX from API outages
-        logger.warning("nba_api ingestion failed; using sample data. Error: %s", exc)
-        return load_sample_team_stats()
+    return fetch_team_stats_with_metadata(season, season_type, force_refresh).stats
 
 
 def fetch_clutch_metrics(

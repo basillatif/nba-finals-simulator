@@ -20,7 +20,7 @@ sys.path.insert(0, str(PROJECT_ROOT))
 if "app" in sys.modules and not hasattr(sys.modules["app"], "__path__"):
     del sys.modules["app"]
 
-from app.data_service import load_team_stats
+from app.data_service import load_team_stats_dataset
 from config.settings import settings
 from data.preprocessing import FEATURE_COLUMNS
 
@@ -28,7 +28,12 @@ from data.preprocessing import FEATURE_COLUMNS
 st.set_page_config(page_title="Model Insights", layout="wide")
 st.title("Model Insights")
 
-teams = load_team_stats(settings.season, settings.season_type)
+dataset = load_team_stats_dataset(settings.season, settings.season_type)
+teams = dataset.teams
+st.caption(f"Data source: {dataset.source.replace('_', ' ').title()}")
+if not dataset.is_real_data:
+    st.error("Real NBA data is unavailable, so model insights are disabled.")
+    st.stop()
 
 st.write(
     "The first model slice uses an interpretable logistic-style heuristic over team differentials. "

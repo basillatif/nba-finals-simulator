@@ -1,4 +1,4 @@
-from app.data_service import load_team_stats
+from app.data_service import load_team_stats, load_team_stats_dataset
 from app.playoff_context import (
     ACTIVE_PLAYOFF_TEAMS,
     EAST_CHAMPION,
@@ -30,3 +30,12 @@ def test_loaded_teams_are_limited_to_active_playoff_teams() -> None:
     teams = set(load_team_stats("2025-26", "Playoffs", force_refresh=False)["team_name"])
 
     assert teams == set(ACTIVE_PLAYOFF_TEAMS)
+
+
+def test_loaded_team_dataset_reports_real_data_source() -> None:
+    dataset = load_team_stats_dataset("2025-26", "Playoffs", force_refresh=False)
+
+    assert dataset.is_real_data
+    assert dataset.source == "cached_nba_api"
+    assert dataset.last_updated is not None
+    assert set(dataset.teams["team_name"]) == set(ACTIVE_PLAYOFF_TEAMS)

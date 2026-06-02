@@ -19,7 +19,7 @@ sys.path.insert(0, str(PROJECT_ROOT))
 if "app" in sys.modules and not hasattr(sys.modules["app"], "__path__"):
     del sys.modules["app"]
 
-from app.data_service import load_team_stats
+from app.data_service import TeamStatsDataset, load_team_stats_dataset
 from app.playoff_context import EAST_CHAMPION, FINALS_MATCHUP, WEST_CHAMPION, team_index
 from config.settings import settings
 from models.baseline import heuristic_game_probability
@@ -149,6 +149,25 @@ def short_team_name(team_name: str) -> str:
     return known_names.get(team_name, team_name.split()[-1])
 
 
+def data_source_label(dataset: TeamStatsDataset) -> str:
+    """Return a readable source label for the app chrome."""
+
+    labels = {
+        "live_nba_api": "Live NBA API",
+        "cached_nba_api": "Cached NBA API",
+        "sample_fallback": "Sample fallback",
+    }
+    return labels.get(dataset.source, dataset.source.replace("_", " ").title())
+
+
+def format_last_updated(dataset: TeamStatsDataset) -> str:
+    """Return a concise timestamp for cached or refreshed data."""
+
+    if dataset.last_updated is None:
+        return "Not available"
+    return dataset.last_updated.astimezone().strftime("%b %d, %Y %I:%M %p %Z")
+
+
 def build_edge_rows(team_a, team_b) -> list[dict[str, str]]:
     """Build readable head-to-head edge rows for the homepage."""
 
@@ -199,7 +218,27 @@ season_type = st.sidebar.selectbox(
 force_refresh = st.sidebar.toggle("Refresh nba_api cache", value=False)
 
 with st.spinner("Loading team metrics..."):
-    teams = load_team_stats(season=season, season_type=season_type, force_refresh=force_refresh)
+    dataset = load_team_stats_dataset(
+        season=season,
+        season_type=season_type,
+        force_refresh=force_refresh,
+    )
+    teams = dataset.teams
+
+st.sidebar.caption(f"Data source: {data_source_label(dataset)}")
+st.sidebar.caption(f"Last updated: {format_last_updated(dataset)}")
+
+if dataset.error:
+    st.sidebar.warning("Live refresh failed; using the latest cached NBA API snapshot.")
+
+if not dataset.is_real_data:
+    st.error(
+        "Real NBA data is unavailable, so predictions are disabled. "
+        "Refresh the NBA API cache or add a tracked NBA API snapshot before launch."
+    )
+    if dataset.error:
+        st.caption(f"Refresh error: {dataset.error}")
+    st.stop()
 
 team_a = teams.loc[teams["team_name"] == WEST_CHAMPION].iloc[0]
 team_b = teams.loc[teams["team_name"] == EAST_CHAMPION].iloc[0]
