@@ -273,11 +273,13 @@ st.markdown(
         <div class="hero-kicker">2026 Finals forecast</div>
         <div class="hero-title">{WEST_CHAMPION} vs {EAST_CHAMPION}</div>
         <div class="hero-copy">
-            A best-of-seven simulator that turns team strengths into a title forecast,
-            series scripts, and the matchup levers most likely to decide June.
+            A best-of-seven simulator now balancing team strength with Finals path context:
+            New York's sweep carries real form, while San Antonio's seven-game Thunder test
+            keeps this from reading like a quick series.
         </div>
         <div class="verdict">
-            First read: {projected_champion} win the title {champion_probability:.1%} of the time.
+            Current read: {projected_champion} win {champion_probability:.1%} of simulations,
+            with {top_outcome_label} as the most likely ending.
         </div>
     </div>
     """,
@@ -288,9 +290,12 @@ summary_cols = st.columns(3)
 summary_cols[0].markdown(
     f"""
     <div class="panel">
-        <div class="panel-label">Projected champion</div>
+        <div class="panel-label">Title lean</div>
         <div class="panel-value">{projected_champion}</div>
-        <div class="panel-note">{champion_probability:.1%} championship probability across {settings.default_simulations:,} series.</div>
+        <div class="panel-note">
+            {champion_probability:.1%} championship probability across {settings.default_simulations:,} series,
+            after the Spurs path adjustment.
+        </div>
     </div>
     """,
     unsafe_allow_html=True,
@@ -300,7 +305,7 @@ summary_cols[1].markdown(
     <div class="panel">
         <div class="panel-label">Most likely ending</div>
         <div class="panel-value">{top_outcome_label}</div>
-        <div class="panel-note">{top_outcome["probability"]:.1%} of simulations ended this way.</div>
+        <div class="panel-note">{top_outcome["probability"]:.1%} of simulations ended this way, ahead of any sweep script.</div>
     </div>
     """,
     unsafe_allow_html=True,
@@ -308,9 +313,9 @@ summary_cols[1].markdown(
 summary_cols[2].markdown(
     f"""
     <div class="panel">
-        <div class="panel-label">Expected fight</div>
+        <div class="panel-label">Expected length</div>
         <div class="panel-value">{result.expected_series_length:.2f} games</div>
-        <div class="panel-note">Neutral Game 1 win probability: {neutral_probability_a:.1%} for {WEST_CHAMPION}.</div>
+        <div class="panel-note">Neutral Game 1 win probability: {neutral_probability_a:.1%} for {WEST_CHAMPION}, enough to stretch the forecast.</div>
     </div>
     """,
     unsafe_allow_html=True,
