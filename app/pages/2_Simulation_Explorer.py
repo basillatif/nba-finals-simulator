@@ -28,6 +28,11 @@ from utils.charts import outcome_histogram, probability_bar
 
 st.set_page_config(page_title="Simulation Explorer", layout="wide")
 st.title("Simulation Explorer")
+st.caption(
+    "Stress-test the Finals forecast after the Spurs path adjustment: New York's sweep still "
+    "matters, but San Antonio's seven-game Thunder series now keeps the matchup from defaulting "
+    "to a quick finish."
+)
 
 dataset = load_team_stats_dataset(settings.season, settings.season_type)
 teams = dataset.teams
@@ -68,6 +73,13 @@ summary_cols = st.columns(3)
 summary_cols[0].metric(f"{team_a_name} title probability", f"{result.team_a_championship_probability:.1%}")
 summary_cols[1].metric(f"{team_b_name} title probability", f"{result.team_b_championship_probability:.1%}")
 summary_cols[2].metric("Expected length", f"{result.expected_series_length:.2f} games")
+
+top_outcome = result.outcomes.sort_values("probability", ascending=False).iloc[0]
+st.info(
+    f"Most likely script: {top_outcome['winner']} in {int(top_outcome['games'])} "
+    f"({top_outcome['probability']:.1%} of simulations). Neutral win probability for "
+    f"{team_a_name}: {neutral_probability_a:.1%}."
+)
 
 st.plotly_chart(
     probability_bar(team_a_name, team_b_name, result.team_a_championship_probability),
