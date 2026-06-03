@@ -179,6 +179,7 @@ def build_edge_rows(team_a, team_b) -> list[dict[str, str]]:
         ("Rebounding", "reb_pct", " percentage points", True),
         ("Close-game profile", "clutch_net_rating", " points per 100", True),
         ("Recent form", "recent_net_rating", " points per 100", True),
+        ("Finals path context", "finals_path_adjustment", " model points", True),
     ]
 
     rows: list[dict[str, str]] = []

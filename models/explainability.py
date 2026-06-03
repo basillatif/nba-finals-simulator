@@ -14,6 +14,7 @@ EXPLANATION_FEATURES = [
     ("reb_pct", "rebounding"),
     ("clutch_net_rating", "clutch performance"),
     ("recent_net_rating", "recent form"),
+    ("finals_path_adjustment", "Finals path context"),
 ]
 
 

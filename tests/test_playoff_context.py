@@ -2,6 +2,7 @@ from app.data_service import load_team_stats, load_team_stats_dataset
 from app.playoff_context import (
     ACTIVE_PLAYOFF_TEAMS,
     EAST_CHAMPION,
+    FINALS_PATH_CONTEXT,
     FINALS_MATCHUP,
     WEST_CHAMPION,
     team_index,
@@ -39,3 +40,12 @@ def test_loaded_team_dataset_reports_real_data_source() -> None:
     assert dataset.source == "cached_nba_api"
     assert dataset.last_updated is not None
     assert set(dataset.teams["team_name"]) == set(ACTIVE_PLAYOFF_TEAMS)
+
+
+def test_finals_path_context_weights_spurs_thunder_path() -> None:
+    assert FINALS_PATH_CONTEXT[WEST_CHAMPION].previous_round_games == 7
+    assert FINALS_PATH_CONTEXT[EAST_CHAMPION].previous_round_games == 4
+    assert (
+        FINALS_PATH_CONTEXT[WEST_CHAMPION].finals_path_adjustment
+        > FINALS_PATH_CONTEXT[EAST_CHAMPION].finals_path_adjustment
+    )

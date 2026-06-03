@@ -9,6 +9,13 @@ import pandas as pd
 from data.preprocessing import FEATURE_COLUMNS, build_preprocessor, create_matchup_features
 
 
+def _bounded_matchup_gap(matchup: pd.Series, column: str, limit: float) -> float:
+    """Return a matchup differential capped to keep volatile samples in range."""
+
+    value = float(matchup.get(column, 0.0))
+    return min(max(value, -limit), limit)
+
+
 def build_logistic_regression_model():
     """Return the baseline model pipeline.
 
@@ -41,14 +48,16 @@ def heuristic_game_probability(
     """
 
     matchup = create_matchup_features(team_a, team_b, FEATURE_COLUMNS).iloc[0]
+    clutch_gap = _bounded_matchup_gap(matchup, "diff_clutch_net_rating", 21.5)
     score = (
         0.34 * matchup.get("diff_net_rating", 0.0)
-        + 0.14 * matchup.get("diff_clutch_net_rating", 0.0)
-        + 0.10 * matchup.get("diff_recent_net_rating", 0.0)
+        + 0.14 * clutch_gap
+        + 0.06 * matchup.get("diff_recent_net_rating", 0.0)
         + 3.8 * matchup.get("diff_ts_pct", 0.0)
         + 0.05 * matchup.get("diff_reb_pct", 0.0)
         - 0.08 * matchup.get("diff_tm_tov_pct", 0.0)
         + 1.6 * matchup.get("diff_playoff_weight", 0.0)
+        + 1.0 * matchup.get("diff_finals_path_adjustment", 0.0)
     )
     score += (injury_adjustment_a - injury_adjustment_b) * 0.55
     score += home_court_edge * 100

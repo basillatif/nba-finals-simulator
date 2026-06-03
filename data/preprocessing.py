@@ -19,6 +19,7 @@ FEATURE_COLUMNS = [
     "clutch_net_rating",
     "recent_net_rating",
     "playoff_weight",
+    "finals_path_adjustment",
 ]
 
 
@@ -29,6 +30,7 @@ def enrich_team_features(team_stats: pd.DataFrame) -> pd.DataFrame:
     df["clutch_net_rating"] = df["clutch_net_rating"].fillna(df["net_rating"])
     df["recent_net_rating"] = df.get("recent_net_rating", df["net_rating"])
     df["playoff_weight"] = df.get("playoff_weight", 1.0)
+    df["finals_path_adjustment"] = df.get("finals_path_adjustment", 0.0)
     df["efficiency_balance"] = df["off_rating"] - df["def_rating"]
     df["possession_quality"] = df["ts_pct"] * 100 - df["tm_tov_pct"] + df["reb_pct"] / 10
     return df
