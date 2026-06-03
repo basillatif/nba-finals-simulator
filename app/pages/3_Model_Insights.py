@@ -37,13 +37,15 @@ if not dataset.is_real_data:
 
 st.write(
     "The first model slice uses an interpretable logistic-style heuristic over team differentials. "
-    "A trained logistic regression pipeline is included as the baseline estimator boundary; the next iteration can add labeled playoff game outcomes and persist model artifacts."
+    "It now tempers noisy recent-form and clutch samples, then adds explicit Finals path context "
+    "so New York's sweep and San Antonio's seven-game Thunder test influence the forecast without "
+    "overwhelming the core team-quality signal."
 )
 
 importance = pd.DataFrame(
     {
         "feature": FEATURE_COLUMNS,
-        "weight": [0.34, -0.18, 0.34, 0.03, 0.22, 0.05, -0.08, 0.14, 0.10, 0.08],
+        "weight": [0.0, 0.0, 0.34, 0.0, 3.8, 0.05, -0.08, 0.14, 0.06, 1.6, 1.0],
     }
 )
 fig = px.bar(
@@ -52,9 +54,15 @@ fig = px.bar(
     y="feature",
     orientation="h",
     template="plotly_white",
-    title="Baseline Feature Direction",
+    title="Heuristic Feature Coefficients",
 )
 st.plotly_chart(fig, use_container_width=True)
+
+st.info(
+    "Finals path context is a manual matchup adjustment: a small haircut for the Knicks' sweep "
+    "layoff/rhythm risk and a Spurs bump for surviving a seven-game Western Conference Finals "
+    "against Oklahoma City."
+)
 
 st.subheader("Team Feature Matrix")
 st.dataframe(
